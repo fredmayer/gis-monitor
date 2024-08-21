@@ -1,0 +1,64 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+    name: Build project
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+        check-latest: true
+        cache-dependency-path: "**/*.sum"
+    
+    - name: Install dependencies
+      run: go mod tidy
+    - run: ls
+
+    - run: mkdir -p bin
+    - name: Build
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C ./cmd -o ../bin/ ./...
+    - run: ls
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Server
+        path: ./bin/server
+
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.FM_HOST }}
+        username: ${{ secrets.FM_USER }}
+        password: ${{ secrets.FM_PASSWORD }}
+        port: 22
+        source: "./bin/*"
+        target: /var/www/services/gis/upload
+        overwrite: true
+
+    - name: restarting remote ssh service
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.FM_HOST }}
+        username: ${{ secrets.FM_USER }}
+        password: ${{ secrets.FM_PASSWORD }}
+        port: 22
+        script: |
+          cd /var/www/services/gis
+          systemctl stop gis
+          rm -rf ./bin
+          mv -f ./upload/* ./bin
+          systemctl restart gis

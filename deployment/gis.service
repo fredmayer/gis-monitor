@@ -1,0 +1,13 @@
+[Unit]
+Description=gis monitor
+After=network.target
+
+[Service]
+Type=simple
+Environment="CONFIG_PATH=/var/www/services/gis/config.yml"
+ExecStart=/var/www/services/bin/gis
+Restart=always
+RuntimeMaxSec=2d
+
+[Install]
+WantedBy=default.target
