@@ -20,6 +20,7 @@ type Tg struct {
 type Gis struct {
 	Host     string            `mapstructure:"host"`
 	Endpoint string            `mapstructure:"endpoint"`
+	Link     string            `mapstructure:"link"`
 	Params   map[string]string `mapstructure:"params"`
 }
 
