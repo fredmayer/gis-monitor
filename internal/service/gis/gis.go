@@ -138,9 +138,10 @@ func (s *Service) Notify(lot *models.LotDto, update bool) {
 		template = fmt.Sprintf("<strong>🌕 Лот обновлен: %s</strong> \n", lot.LotName)
 	}
 
-	link := fmt.Sprintf("\n➡️<a href='%s'>перейти</a>", s.settings.Link)
+	link := s.settings.Host + s.settings.Link + lot.ID
+	linkStr := fmt.Sprintf("\n➡️<a href='%s'>перейти</a>", link)
 
-	template = template + "\nСтатус:" + lot.LotStatus + link
+	template = template + "\nСтатус:" + lot.LotStatus + linkStr
 
 	err := rest.SendTgMessage(context.Background(), config.Instance.Tg.Url, config.Instance.Tg.Token, template)
 
