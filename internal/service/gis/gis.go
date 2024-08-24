@@ -25,7 +25,7 @@ func New(store StoreInterface, client ClientInterface, settings config.Gis) *Ser
 func (s *Service) Handle() {
 	data := s.Parse()
 
-	logging.Log().Debugf("fetched %d lots \n", len(*data))
+	logging.Log().Infof("fetched %d lots \n", len(*data))
 	if len(*data) == 0 {
 		logging.Log().Warnln("parsed data from url is null")
 		return
