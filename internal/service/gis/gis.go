@@ -116,7 +116,9 @@ func (s *Service) Save(dto *models.LotDto, update bool) {
 	}
 
 	if update {
-		err := s.store.Update(&model)
+		m, _ := s.store.GetByUID(dto.ID)
+		m.Status = dto.LotStatus
+		err := s.store.Update(m)
 		if err != nil {
 			logging.Log().Errorln("update error: ", err)
 		}
